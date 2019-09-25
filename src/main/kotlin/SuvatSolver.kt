@@ -6,7 +6,7 @@ val equations: Map<Pair<SUVATVariable, SUVATVariable>, (Double, Double, Double) 
     Pair(Pair(SUVATVariable.S, SUVATVariable.U), {v, a, t -> v*t -(1/2)*a*(t.pow(2))}),
     Pair(Pair(SUVATVariable.S, SUVATVariable.V), {u, a, t -> u*t + (1/2)*a*(t.pow(2))}),
     Pair(Pair(SUVATVariable.S, SUVATVariable.A), {u, v, t -> ((u+v)/2)*t}),
-    Pair(Pair(SUVATVariable.S, SUVATVariable.T), {u, v, a -> (v.pow(2)-u.pow(2))/(-2*a)}),
+    Pair(Pair(SUVATVariable.S, SUVATVariable.T), {u, v, a -> (v.pow(2)-u.pow(2))/(-2*a)}), // wrong?
 
     Pair(Pair(SUVATVariable.U, SUVATVariable.S), {v, a, t -> -1*(a*t-v)}),
     Pair(Pair(SUVATVariable.U, SUVATVariable.V), {s, a, t -> (-1/2)*a*t+(s/t)}),
@@ -28,6 +28,41 @@ val equations: Map<Pair<SUVATVariable, SUVATVariable>, (Double, Double, Double) 
     Pair(Pair(SUVATVariable.T, SUVATVariable.V), {s, u, a -> (u+sqrt(u.pow(2)+2*a*s))/a}),
     Pair(Pair(SUVATVariable.T, SUVATVariable.A), {s, u, v -> s/((u+v)/2)})
 )
+
+
+fun main(args: Array<String>) {
+
+    val suvat: MutableList<Double?> = MutableList(5) { null }
+    lateinit var missingVariable: SUVATVariable
+    lateinit var variableToFind: SUVATVariable
+
+    if (args.size < 5) {
+        println("Wrong number of arguments!")
+        exitProcess(1)
+    }
+
+    for (i in 0 until 5) {
+        suvat[i] = args[i].toDoubleOrNull()
+    }
+
+    if (suvat.count { it == null } > 2) {
+        println("Wrong number of missing variables!")
+        exitProcess(1)
+    }
+    val suvatNotNull = suvat.filterNotNull()
+
+    for (i in 0 until 5) {
+        if (args[i] == "m") {
+            missingVariable = SUVATVariable.values()[i]
+        }
+        if (args[i] == "f") {
+            variableToFind = SUVATVariable.values()[i]
+        }
+    }
+
+    val result = equations[Pair(variableToFind, missingVariable)]?.invoke(suvatNotNull[0], suvatNotNull[1], suvatNotNull[2])
+    println("${variableToFind.name}: $result")
+}
 
 enum class SUVATVariable {
     S,
